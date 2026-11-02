@@ -1,0 +1,7 @@
+DIRECTION CONCEPT SEED
+Key: 887bca2c
+Mode: operate
+Assigned grounded direction index: 4
+Resolved direction: receipt-ledger operating surface
+Approved composition: .impeccable/mocks/hisab-dashboard-approved.png
+Quality reference: the approved high-fidelity composition is the project-specific frame for topology, lettering, material, density, and interaction.

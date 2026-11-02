@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T00:00:00+05:00",
+  "title": "Design System: Hisab",
+  "extensions": {
+    "colorMeta": {
+      "petrol-ink": { "role": "neutral", "displayName": "Petrol Ink", "canonical": "#072b3a", "tonalRamp": ["#02151c", "#072b3a", "#164353", "#365564", "#607b86", "#91a6ad", "#c3d0d3", "#eef3f3"] },
+      "muted-petrol": { "role": "neutral", "displayName": "Muted Petrol", "canonical": "#365564", "tonalRamp": ["#102329", "#203a43", "#365564", "#56727d", "#79929b", "#a1b2b8", "#cad5d8", "#f0f4f4"] },
+      "mineral-paper": { "role": "neutral", "displayName": "Mineral Paper", "canonical": "#f5f8f7", "tonalRamp": ["#15201e", "#2f3c39", "#53615e", "#788783", "#a1ada9", "#c6cfcc", "#e4e9e7", "#f5f8f7"] },
+      "white": { "role": "neutral", "displayName": "White", "canonical": "#ffffff", "tonalRamp": ["#262626", "#454545", "#666666", "#8a8a8a", "#adadad", "#d1d1d1", "#ededed", "#ffffff"] },
+      "ledger-line": { "role": "neutral", "displayName": "Ledger Line", "canonical": "#d6e1e2", "tonalRamp": ["#1d2829", "#344244", "#526264", "#748587", "#9ba9ab", "#bdc9ca", "#d6e1e2", "#f2f6f6"] },
+      "ledger-line-strong": { "role": "neutral", "displayName": "Strong Ledger Line", "canonical": "#b8cacc", "tonalRamp": ["#172526", "#304143", "#4e6264", "#6f8587", "#91a8aa", "#b8cacc", "#d8e2e3", "#f2f6f6"] },
+      "action-turquoise": { "role": "primary", "displayName": "Action Turquoise", "canonical": "#008d8b", "tonalRamp": ["#002b2a", "#004745", "#006764", "#008d8b", "#29aaa7", "#64c5c2", "#a9dfdd", "#e5f6f5"] },
+      "deep-turquoise": { "role": "primary", "displayName": "Deep Turquoise", "canonical": "#006d6b", "tonalRamp": ["#001f1f", "#003b3a", "#005654", "#006d6b", "#25918e", "#64b5b2", "#a9d9d7", "#e5f3f2"] },
+      "turquoise-wash": { "role": "primary", "displayName": "Turquoise Wash", "canonical": "#dff2f1", "tonalRamp": ["#15312f", "#2e514f", "#557875", "#7fa09d", "#a6c7c4", "#c8e2e0", "#dff2f1", "#f2fbfa"] },
+      "restrained-saffron": { "role": "secondary", "displayName": "Restrained Saffron", "canonical": "#d88b16", "tonalRamp": ["#3c2402", "#684004", "#965d08", "#be7710", "#d88b16", "#e5ac55", "#f0ce98", "#fbefd9"] },
+      "confirmed-green": { "role": "secondary", "displayName": "Confirmed Green", "canonical": "#15845e", "tonalRamp": ["#052b1e", "#084934", "#0d684a", "#15845e", "#3ba47c", "#72c29f", "#b2dfca", "#e8f7ef"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Financial Display", "purpose": "Balances and dominant PKR figures only." },
+      "headline": { "displayName": "Workspace Headline", "purpose": "Major workspace and dialog headings." },
+      "title": { "displayName": "Compact Title", "purpose": "Inspector cards and compact section titles." },
+      "body": { "displayName": "Ledger Body", "purpose": "Controls, transaction content, and explanatory copy." },
+      "label": { "displayName": "Operational Label", "purpose": "Table headers, compact actions, and field labels." }
+    },
+    "shadows": [
+      { "name": "receipt-ambient", "value": "0 18px 40px rgba(11,48,58,.09)", "purpose": "Soft lift for the selected transaction receipt." },
+      { "name": "modal-ambient", "value": "0 28px 70px rgba(2,26,35,.28)", "purpose": "Separates the receipt-import dialog from the app." },
+      { "name": "mobile-sheet-ambient", "value": "0 20px 60px rgba(3,31,40,.3)", "purpose": "Separates the mobile purpose-note sheet." },
+      { "name": "selection-inset", "value": "inset 3px 0 #008d8b", "purpose": "Marks active navigation and selected ledger rows." }
+    ],
+    "motion": [
+      { "name": "row-state", "value": "background-color .18s ease, box-shadow .18s ease", "purpose": "Transaction hover and selection transitions." },
+      { "name": "drawer", "value": "transform .25s ease", "purpose": "Off-canvas navigation on tablet and mobile." },
+      { "name": "scan", "value": "1.2s ease-in-out infinite alternate", "purpose": "Receipt extraction scan-line animation; disabled for reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "compact-desktop", "value": "1180px" },
+      { "name": "tablet", "value": "920px" },
+      { "name": "mobile", "value": "680px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact turquoise confirmation action used for saving and confirming.",
+      "html": "<button class=\"ds-btn-primary\">SAVE NOTE</button>",
+      "css": ".ds-btn-primary{height:38px;padding:0 14px;border:0;border-radius:8px;background:var(--teal,#008d8b);color:#fff;font:800 11px/1.2 'Manrope Variable',sans-serif;cursor:pointer;transition:background .18s ease}.ds-btn-primary:hover{background:var(--teal-dark,#006d6b)}.ds-btn-primary:focus-visible{outline:3px solid rgba(0,141,139,.28);outline-offset:2px}.ds-btn-primary:active{background:#005b59}.ds-btn-primary:disabled{background:#b7c8c8;cursor:not-allowed}"
+    },
+    {
+      "name": "Import Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Pale turquoise secondary action for receipt import.",
+      "html": "<button class=\"ds-btn-import\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 3v12m0-12 4 4m-4-4L8 7\"/><path d=\"M5 14v5h14v-5\"/></svg>Import receipt</button>",
+      "css": ".ds-btn-import{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #9ac8c7;border-radius:8px;background:#e6f4f3;color:var(--teal-dark,#006d6b);font:750 11px/1.2 'Manrope Variable',sans-serif;cursor:pointer}.ds-btn-import:hover{background:var(--teal-soft,#dff2f1)}.ds-btn-import:focus-visible{outline:3px solid rgba(0,141,139,.28);outline-offset:2px}.ds-btn-import:active{background:#cfe9e7}"
+    },
+    {
+      "name": "Ledger Search",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Compact bordered search field used above the transaction ledger.",
+      "html": "<label class=\"ds-ledger-search\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg><input placeholder=\"Search\" /></label>",
+      "css": ".ds-ledger-search{height:38px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--line,#d6e1e2);border-radius:9px;background:#fff;color:#5f7882}.ds-ledger-search:focus-within{outline:3px solid rgba(0,141,139,.28);outline-offset:2px}.ds-ledger-search input{width:100%;border:0;outline:0;background:transparent;color:var(--ink,#072b3a);font:400 12px/1.5 'Manrope Variable',sans-serif}"
+    },
+    {
+      "name": "Active Navigation Item",
+      "kind": "nav",
+      "refersTo": "navigation-active",
+      "description": "Deep-petrol rail item with a turquoise inset selection marker.",
+      "html": "<button class=\"ds-nav-active\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M4 4h16v16H4z\"/><path d=\"M8 9h8M8 13h8M8 17h5\"/></svg><span>Transactions</span></button>",
+      "css": ".ds-nav-active{width:100%;min-height:44px;display:flex;align-items:center;gap:13px;padding:0 12px;border:0;border-radius:10px;background:#0d5060;color:#fff;box-shadow:inset 3px 0 #54d0cc;font:400 14px/1.2 'Manrope Variable',sans-serif;text-align:left;cursor:pointer}.ds-nav-active:hover{background:#145d6d}.ds-nav-active:focus-visible{outline:3px solid rgba(84,208,204,.55);outline-offset:2px}.ds-nav-active:active{background:#0a4654}"
+    },
+    {
+      "name": "Synthetic Demo Badge",
+      "kind": "chip",
+      "description": "Warm provenance badge that clearly labels non-production records.",
+      "html": "<span class=\"ds-demo-badge\">Synthetic demo</span>",
+      "css": ".ds-demo-badge{display:inline-block;padding:5px 7px;border-radius:6px;background:#fff0cf;color:#93610c;font:800 8.5px/1.2 'Manrope Variable',sans-serif}.ds-demo-badge:focus-visible{outline:3px solid rgba(216,139,22,.3);outline-offset:2px}"
+    },
+    {
+      "name": "Selected Transaction Row",
+      "kind": "custom",
+      "description": "Dense ledger row with pale selection fill and a turquoise structural rail.",
+      "html": "<button class=\"ds-transaction-row\"><span class=\"ds-row-date\"><strong>31 Oct</strong><small>6:46 PM</small></span><span class=\"ds-merchant-icon\">↗</span><span class=\"ds-merchant\"><strong>SAKHAWAT HUSSAIN</strong><small>Raast transfer</small></span><strong class=\"ds-amount\">PKR -10,300</strong></button>",
+      "css": ".ds-transaction-row{width:100%;min-height:64px;display:grid;grid-template-columns:86px 34px minmax(116px,1fr) auto;gap:10px;align-items:center;padding:7px 28px;border:0;border-bottom:1px solid #e5ecec;background:var(--teal-soft,#dff2f1);color:var(--ink,#072b3a);box-shadow:inset 3px 0 var(--teal,#008d8b);text-align:left;cursor:pointer;transition:background-color .18s ease,box-shadow .18s ease}.ds-transaction-row:hover{background:#d4ecec}.ds-transaction-row:focus-visible{outline:3px solid rgba(0,141,139,.28);outline-offset:-3px}.ds-row-date,.ds-merchant{display:grid;gap:3px}.ds-row-date strong,.ds-merchant strong{font:650 12.5px/1.2 'Manrope Variable',sans-serif}.ds-row-date small,.ds-merchant small{color:#466571;font:400 11px/1.2 'Manrope Variable',sans-serif}.ds-merchant-icon{width:33px;height:33px;display:grid;place-items:center;border-radius:10px;background:#e6f5f0;color:#087d64}.ds-amount{font:700 13.5px/1 'Roboto Condensed',sans-serif;white-space:nowrap}"
+    },
+    {
+      "name": "Receipt Inspector",
+      "kind": "card",
+      "refersTo": "receipt",
+      "description": "Signature paper receipt for the currently selected transaction.",
+      "html": "<article class=\"ds-receipt\"><header><span><small>RAAST TRANSFER</small><strong>SAKHAWAT HUSSAIN</strong></span><b>✓</b></header><section><small>Amount</small><strong>PKR 10,300</strong></section><dl><div><dt>Status</dt><dd><i></i>Completed</dd></div><div><dt>Channel</dt><dd>Raast</dd></div></dl></article>",
+      "css": ".ds-receipt{position:relative;padding:19px 20px 18px;background:#fff;color:var(--ink,#072b3a);box-shadow:0 18px 40px rgba(11,48,58,.09);font-family:'Manrope Variable',sans-serif}.ds-receipt:after{content:'';position:absolute;left:0;right:0;bottom:-7px;height:8px;background:radial-gradient(circle at 7px 0,transparent 7px,#fff 7.6px) 0 0/14px 8px repeat-x}.ds-receipt header{display:flex;justify-content:space-between;align-items:center;padding-bottom:17px;border-bottom:1px dashed var(--line-strong,#b8cacc)}.ds-receipt header span{display:grid;gap:2px}.ds-receipt header small,.ds-receipt section small{color:#607981;font-size:9px}.ds-receipt header strong{font-size:12px}.ds-receipt header b{color:var(--success,#15845e)}.ds-receipt section{display:grid;gap:4px;padding:18px 0 14px}.ds-receipt section strong{font:700 34px/1.05 'Roboto Condensed',sans-serif;letter-spacing:-.025em}.ds-receipt dl{display:grid;gap:9px;margin:0;padding-top:13px;border-top:1px dashed var(--line-strong,#b8cacc)}.ds-receipt dl div{display:flex;justify-content:space-between;font-size:9.5px}.ds-receipt dt{color:#647c85}.ds-receipt dd{display:flex;align-items:center;gap:5px;margin:0;font-weight:650}.ds-receipt dd i{width:7px;height:7px;border-radius:50%;background:var(--success,#15845e)}"
+    },
+    {
+      "name": "Purpose Note Card",
+      "kind": "card",
+      "refersTo": "inspector-card",
+      "description": "Rounded supporting card that attaches human context to the selected receipt.",
+      "html": "<section class=\"ds-note-card\"><label for=\"ds-purpose\">Purpose note <small>Private</small></label><textarea id=\"ds-purpose\" placeholder=\"What was this for?\"></textarea><div><span>0/120</span><button>Save note</button></div></section>",
+      "css": ".ds-note-card{padding:16px;border-radius:14px;background:#fff;color:var(--ink,#072b3a);font-family:'Manrope Variable',sans-serif}.ds-note-card label{display:flex;justify-content:space-between;margin-bottom:9px;font-size:11px;font-weight:800}.ds-note-card label small{color:#6b8088;font-size:8.5px}.ds-note-card textarea{width:100%;height:62px;resize:none;padding:10px;border:1px solid var(--line-strong,#b8cacc);border-radius:9px;background:#fbfdfc;color:var(--ink,#072b3a);font:400 10px/1.5 'Manrope Variable',sans-serif}.ds-note-card textarea:focus-visible{outline:3px solid rgba(0,141,139,.28);outline-offset:2px}.ds-note-card div{display:flex;align-items:center;justify-content:space-between;margin-top:8px}.ds-note-card div span{color:#71868d;font-size:8.5px}.ds-note-card button{min-width:94px;height:33px;border:0;border-radius:8px;background:var(--teal,#008d8b);color:#fff;font-size:10px;font-weight:800;cursor:pointer}.ds-note-card button:hover{background:var(--teal-dark,#006d6b)}.ds-note-card button:focus-visible{outline:3px solid rgba(0,141,139,.28);outline-offset:2px}.ds-note-card button:active{background:#005b59}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Living Receipt Ledger",
+    "overview": "Hisab turns a bank receipt into an ongoing financial record: the dense transaction ledger and the selected transaction’s human purpose stay visible together. The interface feels calm, exact, and private—closer to a well-kept account book than a promotional fintech dashboard. It deliberately avoids a generic grid of metric cards. The system combines mineral-paper surfaces, petrol ink, thin ruled dividers, restrained turquoise actions, small saffron signals, and condensed financial figures. Density is intentional: desktop preserves a scan-efficient operating surface, while smaller layouts progressively remove secondary metadata and recast rows for touch without losing the transaction-and-receipt relationship.",
+    "keyCharacteristics": [
+      "Receipt-led split view with a dense ledger and contextual inspector.",
+      "Deep-ink navigation rail and pale, low-chroma working surfaces.",
+      "Turquoise reserved for actions, selection, connectivity, and trustworthy emphasis.",
+      "Condensed numerals for balances and amounts; humanist sans-serif for working text.",
+      "Ruled lines, dashed receipt separators, and tonal fills provide most structure."
+    ],
+    "rules": [
+      { "name": "The Action-Only Turquoise Rule", "body": "Turquoise signals an available action, active selection, or confirmed connection; it is not decorative background color.", "section": "colors" },
+      { "name": "The Saffron Restraint Rule", "body": "Saffron remains a small signal for demo status or attention and never competes with transaction content.", "section": "colors" },
+      { "name": "The Financial Figure Rule", "body": "Use Roboto Condensed for balances and transaction amounts, not prose or navigation.", "section": "typography" },
+      { "name": "The Dense-but-Legible Rule", "body": "Small metadata is supported by strong contrast, short phrases, generous row height, and clear grouping; do not shrink primary actions or merchant names to metadata scale.", "section": "typography" },
+      { "name": "The Paper-First Depth Rule", "body": "Prefer borders, paper tones, and selection fills before adding a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the ledger and selected receipt visually connected on wide screens.",
+      "Do reserve Roboto Condensed for balances and transaction amounts.",
+      "Do use thin solid rules for interface structure and dashed rules for receipt/accounting semantics.",
+      "Do preserve keyboard focus outlines, readable contrast, text status labels, and reduced-motion behavior.",
+      "Do simplify secondary metadata responsively while preserving merchant, amount, date, and note context."
+    ],
+    "donts": [
+      "Don't replace the operating surface with a generic grid of detached metric cards.",
+      "Don't use turquoise as a decorative wash across large regions; its rarity carries interaction meaning.",
+      "Don't round the signature receipt into an ordinary card or remove its dashed and scalloped paper cues.",
+      "Don't introduce heavy shadows on routine controls and cards.",
+      "Don't imply money movement, live-bank certification, or production connectivity through visual language or copy."
+    ]
+  }
+}
