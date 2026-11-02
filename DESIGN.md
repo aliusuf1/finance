@@ -1,6 +1,6 @@
 ---
 name: Hisab
-description: A calm, receipt-led financial ledger for private, read-only money tracking.
+description: An authenticated, receipt-led ledger with local OCR, human review, and private persistence.
 colors:
   petrol-ink: "#072b3a"
   muted-petrol: "#365564"
@@ -112,12 +112,14 @@ components:
 
 **Creative North Star: “The Living Receipt Ledger”**
 
-Hisab turns a bank receipt into an ongoing financial record: the dense transaction ledger and the selected transaction’s human purpose stay visible together. The interface feels calm, exact, and private—closer to a well-kept account book than a promotional fintech dashboard. It deliberately avoids a generic grid of metric cards.
+Hisab turns a bank receipt into an ongoing, authenticated financial record: the dense receipt ledger and the selected record’s human purpose stay visible together. The interface feels calm, exact, and private—closer to a well-kept account book than a promotional fintech dashboard. It deliberately avoids a generic grid of metric cards.
 
-The system combines mineral-paper surfaces, petrol ink, thin ruled dividers, restrained turquoise actions, small saffron signals, and condensed financial figures. Density is intentional: desktop preserves a scan-efficient operating surface, while smaller layouts progressively remove secondary metadata and recast rows for touch without losing the transaction-and-receipt relationship.
+The system combines mineral-paper surfaces, petrol ink, thin ruled dividers, restrained turquoise actions, small saffron signals, and condensed financial figures. Density is intentional: desktop preserves a scan-efficient operating surface, while smaller layouts progressively remove secondary metadata and recast rows for touch without losing the receipt-and-purpose relationship. The product truth is specific: the source image is processed locally in the browser and is never uploaded; only user-reviewed fields and extracted OCR text are persisted to the signed-in user’s private D1 records.
 
 **Key Characteristics:**
 
+- Authenticated receipt ledger with records scoped to the signed-in user.
+- Local-image OCR followed by required human review before persistence.
 - Receipt-led split view with a dense ledger and contextual inspector.
 - Deep-ink navigation rail and pale, low-chroma working surfaces.
 - Turquoise reserved for actions, selection, connectivity, and trustworthy emphasis.
@@ -136,8 +138,8 @@ The palette is a cool mineral neutral field anchored by near-navy petrol ink, wi
 
 ### Secondary
 
-- **Restrained Saffron** (`#d88b16`): Synthetic-data notices, notification dots, and small exceptional accents; never a broad surface color.
-- **Confirmed Green** (`#15845e`): Completed status, positive amounts, connection dots, and saved-state feedback.
+- **Restrained Saffron** (`#d88b16`): Reserved for future exceptional notices; it is not used in the shipped receipt flow and must never become a broad surface color.
+- **Confirmed Green** (`#15845e`): Local-OCR, Private, and Stored trust cues; never the sole carrier of status meaning.
 
 ### Neutral
 
@@ -152,7 +154,7 @@ The palette is a cool mineral neutral field anchored by near-navy petrol ink, wi
 
 **The Action-Only Turquoise Rule.** Turquoise signals an available action, an active selection, or a confirmed connection; it is not decorative background color.
 
-**The Saffron Restraint Rule.** Saffron remains a small signal for demo status or attention and never competes with transaction content.
+**The Saffron Restraint Rule.** Saffron is reserved for exceptional attention and never competes with receipt content.
 
 ## Typography
 
@@ -178,11 +180,11 @@ The palette is a cool mineral neutral field anchored by near-navy petrol ink, wi
 
 ## Layout
 
-Desktop is a fixed-rail operating surface. The navigation rail is 216px wide, the top bar is 78px high, and the 154px balance statement spans the remaining width. Below it, the workspace divides into a flexible ledger (`minmax(620px, 1fr)`) and a 365px inspector. Ledger rows use explicit column tracks so dates, merchants, categories, amounts, channels, notes, and overflow actions stay vertically aligned.
+Desktop is a fixed-rail operating surface. The navigation rail is 216px wide, the top bar is 78px high, and the 154px receipt summary spans the remaining width. Below it, the workspace divides into a flexible ledger (`minmax(620px, 1fr)`) and a 365px inspector. Ledger rows use explicit column tracks so dates, receivers, channels, amounts, notes, and overflow actions stay vertically aligned. The route itself requires an authenticated ChatGPT user before rendering; the header identifies that account and its avatar acts as the sign-out affordance.
 
 The spatial rhythm is compact and regular: 8–12px inside controls, 16–20px inside cards, 24px for larger content blocks, and 28–30px at primary page edges. Thin solid rules separate durable regions; dashed rules are reserved for receipt/accounting semantics.
 
-At 1180px, the rail contracts to 190px, the inspector to 330px, connection and welcome details disappear, and ledger metadata simplifies. At 920px, the rail becomes an off-canvas 250px drawer, the workspace becomes one column, and the inspector follows the ledger. At 680px, controls collapse further, the balance statement stacks, filters become a two-column grid, and each transaction becomes a two-line, three-column touch row. The mobile purpose-note editor becomes a fixed bottom sheet.
+At 1180px, the rail contracts to 190px, the inspector to 330px, connection and welcome details disappear, and ledger metadata simplifies. At 920px, the rail becomes an off-canvas 250px drawer, the workspace becomes one column, and the inspector follows the ledger. At 680px, controls collapse further, the receipt summary stacks, the primary Add receipt control becomes a compact “Add” action, and each receipt becomes a two-line, three-column touch row. Choosing a row opens a fixed bottom sheet for its purpose note; saving closes the sheet only after the user-scoped PATCH succeeds. The import dialog keeps a near-full-height scrollable panel, stacks gallery and camera choices, places the preview above a single-column review form, and uses 16px inputs to prevent mobile zoom.
 
 ## Elevation & Depth
 
@@ -219,8 +221,8 @@ Buttons are compact, direct, and strongly stateful rather than oversized or prom
 
 ### Chips
 
-- **Style:** Compact 6–7px-radius badges with tinted semantic fills. The synthetic-demo badge uses warm cream with saffron-brown text; mobile read-only uses pale confirmed-green.
-- **State:** Chips communicate status or provenance, not broad navigation. Important status also includes text or an icon so color is never the only cue.
+- **Style:** Compact 6–7px-radius badges with tinted semantic fills. The mobile Private badge uses pale confirmed-green, while the inspector Stored badge pairs the same semantic color with a shield icon.
+- **State:** Chips communicate privacy or persistence status, not broad navigation. Every status includes text and/or a shield icon so color is never the only cue.
 
 ### Cards / Containers
 
@@ -240,7 +242,7 @@ Buttons are compact, direct, and strongly stateful rather than oversized or prom
 
 The navigation rail uses Petrol Ink, pale blue-gray labels, 44px rows, 10px corners, and 19px outline icons. Hover adds a subtle translucent white fill. The active item uses white text, a `#0d5060` field, and a 3px inset turquoise rail. On tablet and mobile, the rail slides in from the left over a dark scrim.
 
-### Transaction Ledger
+### Receipt Ledger
 
 Each transaction row is a full-width button with a 64px desktop minimum height and a ruled lower edge. Hover uses a pale turquoise-gray wash. Selection uses Turquoise Wash plus a 3px inset turquoise rail. Merchant icons use softly tinted 33px rounded squares; category hue helps scanning but merchant, amount, and category text remain independently readable.
 
@@ -250,7 +252,28 @@ The selected record is rendered as a literal receipt: square white paper, soft a
 
 ### Import Dialog
 
-The import flow uses a centered 620px maximum-width modal over a petrol-black scrim. Its dashed turquoise dropzone is large and calm, with a moving scan line only during extraction. Extracted fields use a two-column review grid that collapses to one column on mobile; privacy behavior is stated in a neutral information block before confirmation.
+The import flow uses a centered 620px maximum-width modal over a petrol-black scrim. It is a real state machine rather than a static upload panel:
+
+- **Idle:** Two large dashed choices offer gallery selection or the device’s rear camera. Accepted images are capped at 10 MB; invalid type and size feedback appears inline with `role="alert"`.
+- **Scanning:** The local object-URL preview, moving scan line, spinner, numeric progress, native progress bar, and explicit **Cancel scan** action communicate browser-side OCR. OCR times out after 90 seconds, and cancel terminates the worker and invalidates the active scan.
+- **Error:** The upload choices remain available with a plain-language alert for unsupported files, oversized files, timeout, illegible content, or missing receiver/amount extraction.
+- **Review:** The image preview sits beside editable receiver, PKR amount, date/time, channel, transaction ID, masked account, and optional purpose-note fields. Receiver and a positive amount are required. The status message says nothing is stored until confirmation.
+- **Saving:** **Confirm and save** becomes **Saving record…** and is disabled. The dialog, scrim dismissal, close button, and Escape cancellation are locked until the POST finishes so an in-flight record is not ambiguously abandoned. A failed save returns to Review with the user’s corrections intact and an inline alert.
+
+The privacy block is literal, not aspirational: the source image remains only in the browser object URL and is revoked when replaced or when the dialog closes. The confirmed fields, source filename, and extracted OCR text are sent to the authenticated API and stored in that user’s D1 receipt row; the source image itself is never sent. On open, focus moves into the dialog, Tab and Shift+Tab are trapped within visible enabled controls, Escape and scrim clicks cancel whenever saving is not active, and focus returns to the control that opened the dialog.
+
+### Data, Loading, Empty, and Error States
+
+- **Initial loading:** A centered spinner, “Loading your receipts,” and account-scoped explanation occupy the ledger while GET resolves; the inspector independently shows “No receipt selected.”
+- **Empty account:** “Your receipt ledger is empty” explains the first action and includes **Add first receipt**. This is an authenticated zero-data state, not a demo dataset.
+- **Empty search:** “No matching receipts” preserves the search term and recommends receiver, amount, channel, or note queries without showing a create CTA.
+- **Page load error:** A full-width rose alert sits between summary and workspace with the API message and a **Retry** action. Database-not-ready, unauthenticated, and general record-access failures remain plain language.
+- **Saved selection:** The newest successful POST is prepended, selected, and rendered as a “Database record” with a Stored badge. Missing optional fields explicitly read “Not detected.”
+- **Note persistence:** Desktop and mobile note editors cap input at 500 characters, show Saving…, retain the draft on error, expose a retry action in an alert, and update the selected row only after an authenticated user-scoped PATCH succeeds.
+
+### Authenticated Persistence
+
+The page redirects unauthenticated visitors into the ChatGPT sign-in flow before the dashboard renders. GET, POST, and PATCH each re-check identity server-side. Receipt queries and updates are scoped by `userId`; PATCH also scopes by receipt ID, so a valid ID from another account cannot be edited. POST validates field lengths and a positive PKR amount, applies a 20-receipts-per-minute account limit, and returns only public receipt fields. Raw OCR text is stored for the owner but deliberately omitted from list and mutation responses.
 
 ## Do's and Don'ts
 
@@ -261,6 +284,9 @@ The import flow uses a centered 620px maximum-width modal over a petrol-black sc
 - **Do** use thin solid rules for interface structure and dashed rules for receipt/accounting semantics.
 - **Do** preserve keyboard focus outlines, readable contrast, text status labels, and reduced-motion behavior.
 - **Do** simplify secondary metadata responsively while preserving merchant, amount, date, and note context.
+- **Do** distinguish local image handling from persisted receipt data: say the image is never uploaded, while confirmed fields and extracted OCR text are saved to the private account.
+- **Do** keep OCR, review, saving, and persistence-failure states visually and verbally distinct.
+- **Do** return focus to the opening control after modal cancellation and prevent cancellation while a save is in flight.
 
 ### Don't:
 
@@ -269,3 +295,5 @@ The import flow uses a centered 620px maximum-width modal over a petrol-black sc
 - **Don't** round the signature receipt into an ordinary card or remove its dashed and scalloped paper cues.
 - **Don't** introduce heavy shadows on routine controls and cards.
 - **Don't** imply money movement, live-bank certification, or production connectivity through visual language or copy.
+- **Don't** claim that nothing leaves the device: reviewed fields and OCR text are intentionally persisted, while only the source image remains local.
+- **Don't** bypass review or save automatically after OCR, even when receiver and amount extraction appears confident.

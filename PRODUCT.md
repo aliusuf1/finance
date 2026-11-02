@@ -32,7 +32,7 @@ Daily mobile and desktop use after banking activity. Common records include debi
 - Bank or aggregator access tokens must remain server-side and encrypted at rest; sensitive actions require authorization checks, audit logging, rate limiting, and secure session handling.
 - Transaction records include amount, counterparty or merchant, date and time, channel, account, category, status, and a user-authored purpose note.
 - Users can upload a bank receipt or transaction screenshot for visual extraction of recipient or merchant, amount, date and time, reference, masked account, and channel. Extracted fields require user review before saving; source-image retention is an explicit privacy choice.
-- This first build uses clearly labelled synthetic data. Live Pakistan bank connectivity remains provider-dependent and must use supported, authorized bank or regulated aggregator APIs.
+- Receipt ingestion is production-backed: OCR runs locally in the browser, confirmed fields and OCR text are stored in D1, and every record is scoped to the authenticated Site user. Live Pakistan bank connectivity remains provider-dependent and must use supported, authorized bank or regulated aggregator APIs.
 - The interface uses PKR and Pakistan-relevant terminology, including Raast.
 
 ## Brand Commitments
@@ -42,7 +42,7 @@ Working name: Hisab. Voice: calm, direct, private, and never promotional about s
 ## Evidence on Hand
 
 - User-supplied HBL transfer receipt image at `C:\Users\123\Downloads\9305b732-eeed-4ac2-916b-f254ec5420eb.jfif`, showing a successful PKR 10,300 Raast transfer with receiver, masked account, date, time, and transaction ID.
-- No production bank API credentials, supported-bank agreement, customer claims, benchmarks, or compliance certification are supplied; future work must not fabricate them.
+- No production bank API credentials, supported-bank agreement, customer claims, benchmarks, or compliance certification are supplied; future work must not fabricate them. Receipt OCR does not imply direct bank connectivity.
 
 ## Product Principles
 
