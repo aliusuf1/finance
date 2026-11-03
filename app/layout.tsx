@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/manrope";
 import "./globals.css";
+import HisabClerkProvider from "../components/hisab-clerk-provider";
 
 export const metadata: Metadata = {
   title: "Hisab — Your money, accounted for",
@@ -19,5 +20,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 `;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><span hidden dangerouslySetInnerHTML={{ __html: `<!-- ${designContract} -->` }} />{children}</body></html>;
+  const content = <><span hidden dangerouslySetInnerHTML={{ __html: `<!-- ${designContract} -->` }} />{children}</>;
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  return <html lang="en"><body>{publishableKey ? <HisabClerkProvider publishableKey={publishableKey}>{content}</HisabClerkProvider> : content}</body></html>;
 }
