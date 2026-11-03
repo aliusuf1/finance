@@ -18,6 +18,16 @@ const transactionSchema = z.object({
 });
 
 const postSchema = z.object({ transactions: z.array(transactionSchema).min(1).max(50) });
+const editableSchema = transactionSchema.omit({ sourceName: true, rawText: true, currency: true }).partial();
+const patchSchema = editableSchema.extend({ id: z.string().uuid() }).strict().refine(
+  (value) => Object.keys(value).some((key) => key !== "id"),
+  { message: "Provide at least one receipt field to update." },
+);
+const editableColumns = {
+  receiverName: "receiver_name", amountMinor: "amount_minor", direction: "direction", kind: "kind",
+  occurredAt: "occurred_at", transactionId: "transaction_id", channel: "channel",
+  accountMasked: "account_masked", purposeNote: "purpose_note",
+} as const;
 
 function toPublic(row: Record<string, unknown>) {
   return {
@@ -110,12 +120,32 @@ export async function PATCH(request: Request) {
   try {
     const userId = await clerkUserId(request);
     if (!userId) return Response.json({ error: "Sign in to update a transaction." }, { status: 401 });
-    const parsed = z.object({ id: z.string().uuid(), purposeNote: z.string().trim().max(500) }).safeParse(await requestJson(request));
-    if (!parsed.success) return Response.json({ error: "The note is too long or the transaction is invalid." }, { status: 400 });
-    const { data, error } = await getSupabaseAdmin().from("transactions").update({ purpose_note: parsed.data.purposeNote, updated_at: new Date().toISOString() }).eq("id", parsed.data.id).eq("user_id", userId).select("*").maybeSingle();
+    const parsed = patchSchema.safeParse(await requestJson(request));
+    if (!parsed.success) return Response.json({ error: "Review the receipt details. Enter a name and a valid positive amount, and keep the note under 500 characters." }, { status: 400 });
+    const values: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    for (const key of Object.keys(editableColumns) as (keyof typeof editableColumns)[]) {
+      const value = parsed.data[key];
+      if (value !== undefined) values[editableColumns[key]] = value === "" && key !== "purposeNote" ? null : value;
+    }
+    const { data, error } = await getSupabaseAdmin().from("transactions").update(values).eq("id", parsed.data.id).eq("user_id", userId).select("*").maybeSingle();
     if (error) throw error;
     if (!data) return Response.json({ error: "Transaction not found." }, { status: 404 });
     return Response.json({ receipt: toPublic(data) });
+  } catch (error) {
+    return Response.json({ error: dbError(error) }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const userId = await clerkUserId(request);
+    if (!userId) return Response.json({ error: "Sign in to delete a receipt." }, { status: 401 });
+    const parsed = z.object({ id: z.string().uuid() }).strict().safeParse(await requestJson(request));
+    if (!parsed.success) return Response.json({ error: "The receipt is invalid." }, { status: 400 });
+    const { data, error } = await getSupabaseAdmin().from("transactions").delete().eq("id", parsed.data.id).eq("user_id", userId).select("id").maybeSingle();
+    if (error) throw error;
+    if (!data) return Response.json({ error: "Receipt not found." }, { status: 404 });
+    return Response.json({ id: data.id });
   } catch (error) {
     return Response.json({ error: dbError(error) }, { status: 500 });
   }
