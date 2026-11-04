@@ -76,11 +76,29 @@ test("ambiguous, absent and zero transaction amounts are skipped", () => {
   }
 });
 
+test("ambiguous amounts return a bounded review candidate instead of guessing", () => {
+  const result = parseBankDebitEmail({ ...email, text: `${email.text}\nFee: PKR 35.00` }, senders, now);
+  assert.equal(result.skipped, "amount_unclear");
+  assert.deepEqual(result.review.amountOptions, [125050, 3500]);
+  assert.equal(result.review.receiverName, "Test Merchant");
+  assert.equal(result.review.subject, "Debit transaction alert");
+  assert.match(result.review.excerpt, /PKR 1,250\.50/);
+  assert.ok(result.review.excerpt.length <= 2000);
+  assert.ok(!("text" in result.review));
+});
+
 test("repeated messages and repeated bank transaction references are deduplicated within an import", () => {
   const result = collectBankDebits([email, email, { ...email, messageId: "message-2" }], senders, now);
   assert.equal(result.transactions.length, 1);
   assert.equal(result.skipped.duplicate, 2);
   assert.equal(result.month, "2026-11");
+});
+
+test("unclear alerts are returned separately from import-ready transactions", () => {
+  const result = collectBankDebits([{ ...email, text: `${email.text}\nFee: PKR 35.00` }], senders, now);
+  assert.equal(result.transactions.length, 0);
+  assert.equal(result.unclear.length, 1);
+  assert.equal(result.skipped.amount_unclear, 1);
 });
 
 test("observed Meezan transfer and Raast templates preserve the beneficiary and transaction time", () => {

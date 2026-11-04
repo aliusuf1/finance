@@ -51,6 +51,31 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .gmail-candidate>strong { flex:none; }
 .gmail-import input[type=checkbox] { width:17px; height:17px; flex:none; accent-color:var(--teal); }
 .gmail-preview-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
+.gmail-unclear { margin-top:14px; padding-top:14px; border-top:1px dashed var(--line-strong); }
+.gmail-unclear-heading { display:flex; align-items:flex-start; gap:9px; }
+.gmail-unclear-heading>svg { flex:none; margin-top:1px; color:var(--saffron); }
+.gmail-unclear-heading>div { flex:1; min-width:0; }
+.gmail-unclear-heading h3 { margin:0 0 3px; font-size:14px; font-weight:850; }
+.gmail-unclear-heading p { margin:0; color:var(--ink-2); font-size:12px; line-height:1.55; }
+.gmail-unclear-heading>span { min-width:24px; height:24px; display:grid; place-items:center; border-radius:8px; color:var(--ink); background:color-mix(in srgb,var(--saffron) 24%,var(--white)); font-size:12px; font-weight:850; }
+.gmail-unclear-list { display:grid; gap:10px; margin-top:12px; }
+.gmail-unclear-card { min-width:0; padding:14px; border:1px solid color-mix(in srgb,var(--saffron) 32%,var(--line)); border-radius:10px; background:color-mix(in srgb,var(--saffron) 7%,var(--white)); }
+.gmail-unclear-meta { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; overflow-wrap:anywhere; }
+.gmail-unclear-meta>div { display:grid; gap:3px; min-width:0; }
+.gmail-unclear-meta strong { font-size:14px; }
+.gmail-unclear-meta span,.gmail-unclear-meta small { color:var(--ink-2); font-size:12px; line-height:1.45; }
+.gmail-unclear-meta small { max-width:42%; text-align:right; }
+.gmail-unclear-card details { margin-top:10px; }
+.gmail-unclear-card summary { width:max-content; max-width:100%; color:var(--ink-2); cursor:pointer; font-size:12px; font-weight:750; }
+.gmail-unclear-card pre { max-height:180px; overflow:auto; margin:8px 0 0; padding:10px; border:1px solid var(--line); border-radius:8px; color:var(--ink-2); background:var(--white); font:500 12px/1.55 "Manrope Variable",sans-serif; white-space:pre-wrap; overflow-wrap:anywhere; }
+.gmail-amount-options { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:11px; }
+.gmail-amount-options>span { color:var(--ink-2); font-size:12px; font-weight:750; }
+.gmail-amount-options>div { display:flex; flex-wrap:wrap; gap:6px; }
+.gmail-import .gmail-amount-options button { min-height:30px; padding:5px 8px; border-color:color-mix(in srgb,var(--saffron) 45%,var(--line)); border-radius:6px; color:var(--ink); background:color-mix(in srgb,var(--saffron) 10%,var(--white)); font-size:12px; }
+.gmail-unclear-form { display:grid; grid-template-columns:minmax(0,1fr) minmax(150px,.55fr) auto; gap:9px; align-items:end; margin-top:12px; }
+.gmail-unclear-form label { display:grid; gap:5px; min-width:0; color:var(--ink-2); font-size:11px; font-weight:750; }
+.gmail-unclear-form input { width:100%; height:38px; min-width:0; padding:0 10px; border:1px solid var(--line-strong); border-radius:8px; color:var(--ink); background:#fff; font-size:14px; }
+.gmail-review-note { margin:8px 0 0; color:var(--ink-2); font-size:12px; line-height:1.5; }
 @media (max-width:680px) {
   .gmail-import { margin:0 16px 18px; padding:14px; }
   .gmail-heading { flex-wrap:wrap; gap:10px; }
@@ -58,6 +83,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .gmail-heading>.gmail-primary { flex:1; }
   .gmail-candidate { gap:8px; font-size:12px; }
   .gmail-candidate>strong { max-width:110px; text-align:right; }
+  .gmail-unclear-meta { display:grid; gap:5px; }
+  .gmail-unclear-meta small { max-width:none; text-align:left; }
+  .gmail-unclear-form { grid-template-columns:1fr; }
+  .gmail-unclear-form input { font-size:16px; }
+  .gmail-unclear-form .gmail-primary { width:100%; }
 }
 .app-shell { min-height:100vh; display:flex; background:var(--paper); }
 .sidebar { width:216px; min-height:100vh; position:fixed; inset:0 auto 0 0; z-index:30; display:flex; flex-direction:column; padding:27px 18px 22px; background:var(--ink); color:#eef8f8; }

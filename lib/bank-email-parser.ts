@@ -30,9 +30,16 @@ export type BankEmailTransaction = {
   sourceName: string;
 };
 
+export type BankEmailReviewCandidate = Omit<BankEmailTransaction, "amountMinor" | "currency" | "direction" | "purposeNote"> & {
+  subject: string;
+  amountOptions: number[];
+  excerpt: string;
+};
+
 type ParseResult = { transaction: BankEmailTransaction; skipped?: never } | {
   transaction?: never;
   skipped: "sender" | "not_debit" | "date_unclear" | "outside_month" | "amount_unclear";
+  review?: BankEmailReviewCandidate;
 };
 
 const bankNames: Record<Bank, string> = { meezan: "Meezan Bank Alert", hbl: "HBL Digital Banking" };
@@ -73,14 +80,36 @@ function transactionDate(text: string): string | null {
   return dates.size === 1 ? [...dates][0] : null;
 }
 
-function debitAmount(text: string): number | null {
+function debitAmounts(text: string): number[] {
   // Remove balance clauses so an available balance cannot become the transaction amount.
   const withoutBalances = text.replace(/\b(?:available|remaining|closing|current|opening)?\s*balance\b[^\n;]*/gi, "");
   const amounts = [...withoutBalances.matchAll(/(?:PKR|Rs\.?)\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{1,2})?)(?![\d,]|\.\d)/gi)];
-  const values = new Set(amounts.map((match) => Math.round(Number(match[1].replaceAll(",", "")) * 100)));
-  if (values.size !== 1) return null;
-  const amount = [...values][0];
-  return Number.isSafeInteger(amount) && amount > 0 && amount <= 100_000_000_000 ? amount : null;
+  return [...new Set(amounts.map((match) => Math.round(Number(match[1].replaceAll(",", "")) * 100)))]
+    .filter((amount) => Number.isSafeInteger(amount) && amount > 0 && amount <= 100_000_000_000);
+}
+
+function transactionDetails(bank: Bank, email: BankEmail, body: string, date: string) {
+  const text = `${email.subject}\n${body}`;
+  const kind: TransactionKind = /\bATM\b|cash\s+withdraw/i.test(text) ? "atm" : /\b(?:bank\s+fee|bank\s+charges)\b/i.test(text) ? "bank_fee" : /\b(?:purchase|POS|merchant)\b/i.test(text) ? "card" : /\b(?:transfer|Raast|IBFT)\b/i.test(text) ? "transfer_out" : "other";
+  const labelledName = body.match(/(?:(?:beneficiary|receiver)(?:\s+(?:account\s+)?(?:title|name))?|merchant(?:\s+name)?|paid\s+to|terminal\s+name)\s*:[\s:]*([^\n;:]+)/i)?.[1];
+  const sentTo = body.match(/\bsent\s+to\s+(.+?)\s+(?:on|from)\s+(?:your\s+)?account\b/i)?.[1]?.replace(/\s*\([^)]*$/, "");
+  const receiverName = (labelledName || sentTo)?.trim().slice(0, 120) || `${bankNames[bank]} debit`;
+  const time = body.match(/(?:transaction\s+time\s*:[\s:]*|date\s+(?:and|&)\s+time\s*:[\s:]*[^\n]*?\b)(\d{1,2}:\d{2})(?::\d{2})?\b/i)?.[1];
+  const validTime = time && Number(time.split(":")[0]) < 24 && Number(time.split(":")[1]) < 60 ? time.padStart(5, "0") : "";
+  return {
+    messageId: email.messageId, bank, receiverName, kind,
+    occurredAt: date + (validTime ? ` · ${validTime}` : ""),
+    transactionId: body.match(/(?:transaction|reference|trx)\s*(?:ID|number|no\.?)\s*[:#-]\s*([\w-]+)/i)?.[1]?.slice(0, 100) ?? "",
+    channel: /\bRaast\b/i.test(text) ? "Raast" : /\bIBFT\b/i.test(text) ? "Bank transfer" : kind === "atm" ? "ATM" : kind === "card" ? "Card" : bank === "hbl" ? "HBL" : "Meezan",
+    accountMasked: body.match(/(?:[*xX•]{1,}\s*\d{3,4})\b/)?.[0] ?? "",
+    sourceName: `${bankNames[bank]} email`,
+  };
+}
+
+function reviewExcerpt(body: string) {
+  const useful = body.split("\n").map((line) => line.trim()).filter((line) =>
+    line && /\b(?:PKR|Rs\.?|amount|debit|date|time|beneficiary|receiver|merchant|transaction|reference|account|ATM|Raast)\b/i.test(line));
+  return (useful.length ? useful : body.split("\n").map((line) => line.trim()).filter(Boolean)).slice(0, 12).join("\n").slice(0, 2000);
 }
 
 export function parseBankDebitEmail(email: BankEmail, senders: BankAlertSenders, now = new Date()): ParseResult {
@@ -100,27 +129,19 @@ export function parseBankDebitEmail(email: BankEmail, senders: BankAlertSenders,
   const date = transactionDate(body);
   if (!date) return { skipped: "date_unclear" };
   if (!date.startsWith(`${currentPakistanMonth(now).key}-`)) return { skipped: "outside_month" };
-  const amountMinor = debitAmount(body);
-  if (amountMinor === null) return { skipped: "amount_unclear" };
-  const kind: TransactionKind = /\bATM\b|cash\s+withdraw/i.test(text) ? "atm" : /\b(?:bank\s+fee|bank\s+charges)\b/i.test(text) ? "bank_fee" : /\b(?:purchase|POS|merchant)\b/i.test(text) ? "card" : /\b(?:transfer|Raast|IBFT)\b/i.test(text) ? "transfer_out" : "other";
-  const labelledName = body.match(/(?:(?:beneficiary|receiver)(?:\s+(?:account\s+)?(?:title|name))?|merchant(?:\s+name)?|paid\s+to|terminal\s+name)\s*:[\s:]*([^\n;:]+)/i)?.[1];
-  const sentTo = body.match(/\bsent\s+to\s+(.+?)\s+(?:on|from)\s+(?:your\s+)?account\b/i)?.[1]?.replace(/\s*\([^)]*$/, "");
-  const receiverName = (labelledName || sentTo)?.trim().slice(0, 120) || `${bankNames[bank]} debit`;
-  const time = body.match(/(?:transaction\s+time\s*:[\s:]*|date\s+(?:and|&)\s+time\s*:[\s:]*[^\n]*?\b)(\d{1,2}:\d{2})(?::\d{2})?\b/i)?.[1];
-  const validTime = time && Number(time.split(":")[0]) < 24 && Number(time.split(":")[1]) < 60 ? time.padStart(5, "0") : "";
+  const details = transactionDetails(bank, email, body, date);
+  const amountOptions = debitAmounts(body);
+  if (amountOptions.length !== 1) return { skipped: "amount_unclear", review: {
+    ...details, subject: email.subject.slice(0, 200), amountOptions, excerpt: reviewExcerpt(body),
+  } };
   return { transaction: {
-    messageId: email.messageId,
-    bank, receiverName, amountMinor, currency: "PKR", direction: "outgoing", kind,
-    occurredAt: date + (validTime ? ` · ${validTime}` : ""),
-    transactionId: body.match(/(?:transaction|reference|trx)\s*(?:ID|number|no\.?)\s*[:#-]\s*([\w-]+)/i)?.[1]?.slice(0, 100) ?? "",
-    channel: /\bRaast\b/i.test(text) ? "Raast" : /\bIBFT\b/i.test(text) ? "Bank transfer" : kind === "atm" ? "ATM" : kind === "card" ? "Card" : bank === "hbl" ? "HBL" : "Meezan",
-    accountMasked: body.match(/(?:[*xX•]{1,}\s*\d{3,4})\b/)?.[0] ?? "",
-    purposeNote: "", sourceName: `${bankNames[bank]} email`,
+    ...details, amountMinor: amountOptions[0], currency: "PKR", direction: "outgoing", purposeNote: "",
   } };
 }
 
 export function collectBankDebits(emails: BankEmail[], senders: BankAlertSenders, now = new Date()) {
   const transactions: BankEmailTransaction[] = [];
+  const unclear: BankEmailReviewCandidate[] = [];
   const skipped: Record<string, number> = {};
   const seenMessages = new Set<string>();
   const seenReferences = new Set<string>();
@@ -128,12 +149,16 @@ export function collectBankDebits(emails: BankEmail[], senders: BankAlertSenders
     if (seenMessages.has(email.messageId)) { skipped.duplicate = (skipped.duplicate ?? 0) + 1; continue; }
     seenMessages.add(email.messageId);
     const result = parseBankDebitEmail(email, senders, now);
-    if (result.skipped) { skipped[result.skipped] = (skipped[result.skipped] ?? 0) + 1; continue; }
+    if (result.skipped) {
+      skipped[result.skipped] = (skipped[result.skipped] ?? 0) + 1;
+      if (result.review) unclear.push(result.review);
+      continue;
+    }
     const row = result.transaction;
     const referenceKey = row.transactionId ? `${row.bank}:${row.transactionId}:${row.occurredAt}:${row.amountMinor}` : "";
     if (referenceKey && seenReferences.has(referenceKey)) { skipped.duplicate = (skipped.duplicate ?? 0) + 1; continue; }
     if (referenceKey) seenReferences.add(referenceKey);
     transactions.push(row);
   }
-  return { transactions, skipped, month: currentPakistanMonth(now).key };
+  return { transactions, unclear, skipped, month: currentPakistanMonth(now).key };
 }

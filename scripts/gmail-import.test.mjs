@@ -43,6 +43,17 @@ test("plain text takes priority over alternate HTML and attachments are not fetc
   assert.equal(result.transactions[0].amountMinor, 25000);
 });
 
+test("unclear bank alerts expose only review fields and possible amounts", async () => {
+  const ambiguous = `${body}\nBank fee: PKR 35.00`;
+  const api = loadTestModule("lib/gmail-import.ts", { fetch: async () => Response.json(message("abc123", { body: { data: encode(ambiguous) } })) });
+  const result = await api.readBankMessages(session, ["abc123"], now);
+  assert.equal(result.transactions.length, 0);
+  assert.equal(result.unclear.length, 1);
+  assert.deepEqual(result.unclear[0].amountOptions, [25000, 3500]);
+  assert.match(result.unclear[0].excerpt, /PKR 250\.00/);
+  assert.ok(!("text" in result.unclear[0]));
+});
+
 test("HTML-only bank emails can be parsed without executing HTML", async () => {
   const api = loadTestModule("lib/gmail-import.ts", { fetch: async () => Response.json(message("abc123", { mimeType: "text/html", body: { data: encode("<style>PKR 500</style><p>Your account was debited PKR 250.00.</p><table><tr><td>Date</td><td>03-Nov-2026</td></tr><tr><td>Merchant</td><td>Test &amp; shop</td></tr></table>") } })) });
   const result = await api.readBankMessages(session, ["abc123"], now);

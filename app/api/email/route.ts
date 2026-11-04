@@ -11,6 +11,13 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("disconnect") }).strict(),
   z.object({ action: z.literal("preview"), pageToken: z.string().max(2048).optional(), month: z.string().regex(/^\d{4}-\d{2}$/).optional() }).strict(),
   z.object({ action: z.literal("import"), messageIds: z.array(z.string().regex(/^[a-zA-Z0-9_-]{1,256}$/)).min(1).max(50), month: z.string().regex(/^\d{4}-\d{2}$/) }).strict(),
+  z.object({
+    action: z.literal("import_unclear"),
+    messageId: z.string().regex(/^[a-zA-Z0-9_-]{1,256}$/),
+    month: z.string().regex(/^\d{4}-\d{2}$/),
+    receiverName: z.string().trim().min(1).max(120),
+    amountMinor: z.number().int().positive().max(100_000_000_000),
+  }).strict(),
 ]);
 function json(data: unknown, status = 200, cookie?: string) {
   return Response.json(data, { status, headers: { "Cache-Control": "private, no-store", ...(cookie ? { "Set-Cookie": cookie } : {}) } });
@@ -50,15 +57,41 @@ export async function POST(request: Request) {
     if (input.data.action === "preview") {
       const result = await listBankDebits(session, input.data.pageToken);
       const transactions = await Promise.all(result.transactions.map(async (item) => ({ ...item, id: await emailReceiptId(userId, session.email, emailImportKey(item)) })));
+      const unclear = await Promise.all(result.unclear.map(async (item) => ({ ...item, id: await emailReceiptId(userId, session.email, item.messageId) })));
       let savedIds = new Set<string>();
-      if (transactions.length) {
-        const { data, error } = await getSupabaseAdmin().from("transactions").select("id").eq("user_id", userId).in("id", transactions.map((item) => item.id));
+      const candidateIds = [...transactions.map((item) => item.id), ...unclear.map((item) => item.id)];
+      if (candidateIds.length) {
+        const { data, error } = await getSupabaseAdmin().from("transactions").select("id").eq("user_id", userId).in("id", candidateIds);
         if (error) throw error;
         savedIds = new Set((data ?? []).map((row) => row.id));
       }
-      return json({ ...result, transactions: transactions.filter((item) => !savedIds.has(item.id)), alreadyImported: savedIds.size }, 200, sessionCookie);
+      return json({ ...result, transactions: transactions.filter((item) => !savedIds.has(item.id)), unclear: unclear.filter((item) => !savedIds.has(item.id)), alreadyImported: savedIds.size }, 200, sessionCookie);
     }
-    // Re-read and revalidate Gmail messages: the browser never supplies trusted amounts or dates.
+    // Re-read and revalidate Gmail messages. Manual amounts are accepted only for a message
+    // that the server independently confirms is a current-month debit with an unclear amount.
+    if (input.data.action === "import_unclear") {
+      const messageId = input.data.messageId;
+      const result = await readBankMessages(session, [messageId]);
+      const review = result.unclear.find((item) => item.messageId === messageId);
+      if (!review) return json({ error: "This alert is no longer an unclear current-month debit. Fetch this month's alerts again." }, 409, sessionCookie);
+      const item = {
+        messageId: review.messageId, bank: review.bank, receiverName: input.data.receiverName.trim(),
+        amountMinor: input.data.amountMinor, currency: "PKR" as const, direction: "outgoing" as const,
+        kind: review.kind, occurredAt: review.occurredAt, transactionId: review.transactionId,
+        channel: review.channel, accountMasked: review.accountMasked, purposeNote: "", sourceName: review.sourceName,
+      };
+      const now = new Date().toISOString();
+      const id = await emailReceiptId(userId, session.email, review.messageId);
+      const { data, error } = await getSupabaseAdmin().from("transactions").upsert({
+        id, user_id: userId, receiver_name: item.receiverName, amount_minor: item.amountMinor, currency: item.currency,
+        direction: item.direction, kind: item.kind, occurred_at: item.occurredAt, transaction_id: item.transactionId || null,
+        channel: item.channel, account_masked: item.accountMasked || null, purpose_note: "", source_name: item.sourceName,
+        raw_text: "", created_at: now, updated_at: now,
+      }, { onConflict: "id", ignoreDuplicates: true }).select("id");
+      if (error) throw error;
+      return json({ imported: data?.length ?? 0, alreadyImported: data?.length ? 0 : 1, month: result.month }, 200, sessionCookie);
+    }
+    // Standard imports never trust browser-supplied transaction values.
     const result = await readBankMessages(session, [...new Set(input.data.messageIds)]);
     const now = new Date().toISOString();
     const values = await Promise.all(result.transactions.map(async (item) => ({
